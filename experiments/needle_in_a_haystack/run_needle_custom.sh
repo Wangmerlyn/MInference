@@ -43,6 +43,7 @@ echo "Run Name: $run_name"
 mkdir -p data
 wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl -O ./data/pg19_mini.jsonl
 
+echo "starting 0-4"
 # Run the Needle in A Haystack Test
 python experiments/needle_in_a_haystack/needle_test.py \
     --model_name $model_name \
@@ -53,7 +54,7 @@ python experiments/needle_in_a_haystack/needle_test.py \
     --output_path $needle_output_path \
     --run_name $run_name \
     --jobs 0-4
-
+echo "finish 0-4"
 python experiments/needle_in_a_haystack/needle_test.py \
     --model_name $model_name \
     --max_length $max_length \
@@ -64,10 +65,12 @@ python experiments/needle_in_a_haystack/needle_test.py \
     --output_path $needle_output_path \
     --run_name $run_name \
     --jobs 4-15
+echo "finish 4-15"
+echo "starting summary"
 
 # Data Summary
 python experiments/needle_in_a_haystack/needle_summary.py --output_path $summary_output_path --run_name $run_name
-
+echo "starting plot"
 # Visualization
 mkdir -p $figure_output_path
 python experiments/needle_in_a_haystack/needle_viz.py --res_file $summary_output_path/$run_name.json --model_name $model_name_last_part --mode hf --output_path $figure_output_path
