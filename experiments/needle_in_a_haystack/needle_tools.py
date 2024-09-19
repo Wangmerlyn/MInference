@@ -223,13 +223,22 @@ class LLMNeedleHaystackTester:
             )
             self.generation_config = SamplingParams(temperature=0, max_tokens=64)
         else:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                self.config.model_name,
-                torch_dtype="auto",
-                device_map="cuda",
-                trust_remote_code=config.trust_remote_code,
-                **kwargs,
-            )
+            if self.config.attn_type == "hf":
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    self.config.model_name,
+                    torch_dtype=torch.bfloat16,
+                    device_map="auto",
+                    trust_remote_code=config.trust_remote_code,
+                    attn_implementation="flash_attention_2"
+                )
+            else:
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    self.config.model_name,
+                    torch_dtype="auto",
+                    device_map="cuda",
+                    trust_remote_code=config.trust_remote_code,
+                    **kwargs,
+                )
             self.model = minference_patch(self.model)
             self.generation_config = GenerationConfig(
                 max_new_tokens=32,

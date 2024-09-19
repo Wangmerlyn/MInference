@@ -102,7 +102,7 @@ def plot_needle_viz(
     elif any(key in model_name for key in ["Phi", "Qwen2"]):
         context = "128K"
     else:
-        context = "1M"
+        context = "128K"
     plt.title(
         f"Needle in A Haystack {model_name}{name} {context} Context"
     )  # Adds a title
