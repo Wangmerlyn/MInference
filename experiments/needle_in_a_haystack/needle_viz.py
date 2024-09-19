@@ -149,10 +149,12 @@ if __name__ == "__main__":
     args.add_argument("--res_file", type=str, required=True)
     args.add_argument("--model_name", type=str, required=True)
     args.add_argument("--mode", type=str)
+    args.add_argument("--output_path", type=str, default="figures/")
     args = args.parse_args()
 
     plot_needle_viz(
         args.res_file,
         model_name=args.model_name,
         mode=args.mode,
+        output_path=args.output_path,
     )
