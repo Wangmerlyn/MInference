@@ -13,7 +13,7 @@ def summary(run_name: str, output_path: str):
     datas, cs = [], set()
     for path in pathlist:
         if run_name in path:
-            data = json.load(open(dirs + path))
+            data = json.load(open(os.path.join(output_path, path)))
             if data[0]["context_length"] in cs:
                 continue
             datas.extend(data)
@@ -25,7 +25,7 @@ def summary(run_name: str, output_path: str):
         if ii["correct"] is False:
             print(ii["response"])
     sorted(res.items())
-    with open("{output_path}/{run_name}.json", "w") as json_file:
+    with open(f"{output_path}/{run_name}.json", "w") as json_file:
         json.dump(datas, json_file)
 
 
