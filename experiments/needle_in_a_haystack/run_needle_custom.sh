@@ -69,7 +69,7 @@ echo "finish 4-15"
 echo "starting summary"
 
 # Data Summary
-python experiments/needle_in_a_haystack/needle_summary.py --output_path $summary_output_path --run_name $run_name
+python experiments/needle_in_a_haystack/needle_summary.py --output_path $summary_output_path --run_name $run_name --needle_path $needle_output_path
 echo "starting plot"
 # Visualization
 mkdir -p $figure_output_path

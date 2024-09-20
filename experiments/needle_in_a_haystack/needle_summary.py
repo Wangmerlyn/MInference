@@ -7,13 +7,13 @@ import os
 from collections import Counter
 
 
-def summary(run_name: str, output_path: str):
-    pathlist = os.listdir(output_path)
+def summary(run_name: str, output_path: str, needle_path: str):
+    pathlist = os.listdir(needle_path)
 
     datas, cs = [], set()
     for path in pathlist:
         if run_name in path:
-            data = json.load(open(os.path.join(output_path, path)))
+            data = json.load(open(os.path.join(needle_path, path)))
             if data[0]["context_length"] in cs:
                 continue
             datas.extend(data)
@@ -33,9 +33,11 @@ if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("--run_name", type=str, default=None)
     args.add_argument("--output_path", type=str, default="results/needle/")
+    args.add_argument("--needle_path", type=str, default="results/needle/")
     args = args.parse_args()
 
     summary(
         run_name=args.run_name,
         output_path=args.output_path,
+        needle_path=args.needle_path,
     )
