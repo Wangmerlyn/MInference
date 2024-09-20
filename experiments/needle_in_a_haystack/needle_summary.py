@@ -12,7 +12,7 @@ def summary(run_name: str, output_path: str, needle_path: str):
 
     datas, cs = [], set()
     for path in pathlist:
-        if run_name in path:
+        if run_name in path and path.endswith(".json"):
             data = json.load(open(os.path.join(needle_path, path)))
             if data[0]["context_length"] in cs:
                 continue
