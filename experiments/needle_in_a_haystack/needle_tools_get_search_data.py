@@ -125,7 +125,7 @@ class LLMNeedleHaystackTester:
             while toks < max_context_length:
                 text = json.loads(f.readline())["text"]
                 context += text
-                toks += len(self.tokenizer.encode(text))
+                toks += len(self.tokenizer.encode(text, add_special_tokens=False))
             contexts.append(context)
         return contexts
 
@@ -156,8 +156,8 @@ class LLMNeedleHaystackTester:
         return results
 
     def insert_needle(self, needle, context, depth_percent, context_length):
-        tokens_needle = self.tokenizer.encode(needle)
-        tokens_context = self.tokenizer.encode(context)
+        tokens_needle = self.tokenizer.encode(needle, add_special_tokens=False)
+        tokens_context = self.tokenizer.encode(context, add_special_tokens=False)
 
         # Reducing the context length by 150 buffer. This is to account for system message, the user question, and response.
         context_length -= self.final_context_length_buffer
@@ -202,7 +202,7 @@ class LLMNeedleHaystackTester:
         results = []
         full_contexts = self.read_context_files(self.config.n_rounds)
         full_tokens = [
-            self.tokenizer.encode(full_context) for full_context in tqdm(full_contexts)
+            self.tokenizer.encode(full_context,add_special_tokens=False) for full_context in tqdm(full_contexts)
         ]
 
         start = time.time()
@@ -269,11 +269,14 @@ class LLMNeedleHaystackTester:
 class Config:
     # wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl
     haystack_file: str = "data/pg19_mini.jsonl"  # Path to the haystack file
-    model_name: str = "/mnt/longcontext/models/nishang/mistral_version"  # Path to the model
+    # model_name: str = "/mnt/longcontext/models/nishang/mistral_version"  # Path to the model
+    model_name:str = "/mnt/longcontext/models/nishang/phi-3-1-mini-l-m-5-3-8k-128k-ntk-159.5-mscale-1-8k-128k-step-200"
     run_name: str = None  # Name of the run, used for the output file
     # 113 for phi3 offset
-    context_lengths_min: int = 131072+131072+113
-    context_lengths_max: int = 131072+131072+113
+    # 118 for llama3
+    # 118 for llama3 256k
+    context_lengths_min: int = 131072+118+131072
+    context_lengths_max: int = 131072+118+131072
     n_context_length_intervals: int = 1  # Number of intervals between min and max
     n_document_depth_intervals: int = 10  # position of the needle in the haystack
     n_rounds: int = 1
@@ -284,7 +287,7 @@ class Config:
     kv_cache_cpu: bool = False
     trust_remote_code: bool = False
     kv_cache_cpu_device: str = "cpu"
-    output_file = "needle_phi3_search_256k.json"
+    output_file = "needle_llama3_search_256k.json"
 
 if __name__ == "__main__":
     config = Config
