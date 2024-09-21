@@ -128,7 +128,7 @@ class LLMNeedleHaystackTester:
     def __init__(
         self,
         config,
-        retrieval_question="What is the special magic {} number?",
+        retrieval_question="What is the best thing to do in San Francisco?",
         results_version=1,
         rnd_number_digits=7,
         document_depth_percent_min=0,
@@ -146,7 +146,7 @@ class LLMNeedleHaystackTester:
         document_depth_percent_intervals = config.n_document_depth_intervals
 
         self.config = config
-        self.needle = "\nThe special magic {city} number is: {rnd_number}\n"
+        self.needle = "\nThe best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day.\n"
         if not haystack_file or not retrieval_question:
             raise ValueError(
                 "Needle, haystack, and retrieval_question must be provided."
@@ -283,8 +283,8 @@ class LLMNeedleHaystackTester:
         depth_percent,
         seed,
     ):
-        needle = self.needle.format(city=random_city, rnd_number=needle_rnd_number)
-        question = self.retrieval_question.format(random_city)
+        needle = self.needle
+        question = self.retrieval_question
         if not insert_needle:
             needle = " "  # replace needle with a space
         context = self.insert_needle(
@@ -369,6 +369,7 @@ class LLMNeedleHaystackTester:
                     needle_rnd_number = str(
                         self.generate_random_number(self.rnd_number_digits)
                     )
+                    needle_rnd_number = "eat a sandwich and sit in Dolores Park on a sunny day"
                     print("context length: " + str(context_length))
                     print("depth_percent : " + str(depth_percent))
                     context = self.create_contexts(
@@ -407,7 +408,7 @@ class LLMNeedleHaystackTester:
                         "depth_percent": context["depth_percent"],
                         "response": out,
                         "answer": context["needle_rnd_number"],
-                        "correct": context["needle_rnd_number"] in out,
+                        "correct": context["needle_rnd_number"].lower() in out.lower(),
                         "seed": context["seed"],
                     }
                 )
