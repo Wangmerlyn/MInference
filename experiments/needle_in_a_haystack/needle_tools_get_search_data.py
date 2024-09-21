@@ -231,14 +231,15 @@ class LLMNeedleHaystackTester:
                 prompt = template.format(
                     context=context["context"], question=context["question"]
                 )
+                answer = "The best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day."
                 results.append(
                     {
                         "context_length": context["context_length"],
                         "depth_percent": context["depth_percent"],
-                        "answer": 'The best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day.',
+                        "answer": answer,
                         "seed": context["seed"],
-                        "synthetic": self.tokenizer.encode(prompt),
-                        "synthetic_length": len(self.tokenizer.encode(prompt)),
+                        "synthetic": self.tokenizer.encode(prompt+answer),
+                        "synthetic_length": len(self.tokenizer.encode(prompt+answer)),
                     }
                 )
             with open(self.config.output_file, "w") as f:
@@ -270,8 +271,9 @@ class Config:
     haystack_file: str = "data/pg19_mini.jsonl"  # Path to the haystack file
     model_name: str = "/mnt/longcontext/models/nishang/mistral_version"  # Path to the model
     run_name: str = None  # Name of the run, used for the output file
-    context_lengths_min: int = 131072
-    context_lengths_max: int = 131072
+    # 113 for phi3 offset
+    context_lengths_min: int = 131072+131072+113
+    context_lengths_max: int = 131072+131072+113
     n_context_length_intervals: int = 1  # Number of intervals between min and max
     n_document_depth_intervals: int = 10  # position of the needle in the haystack
     n_rounds: int = 1
@@ -282,7 +284,7 @@ class Config:
     kv_cache_cpu: bool = False
     trust_remote_code: bool = False
     kv_cache_cpu_device: str = "cpu"
-    output_file = "needle_phi3_search.json"
+    output_file = "needle_phi3_search_256k.json"
 
 if __name__ == "__main__":
     config = Config
