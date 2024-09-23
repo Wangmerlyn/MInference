@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 from collections import Counter
+from rouge_score import rouge_scorer
 
 
 def summary(run_name: str, output_path: str, needle_path: str):
@@ -25,6 +26,13 @@ def summary(run_name: str, output_path: str, needle_path: str):
         if ii["correct"] is False:
             print(ii["response"])
     sorted(res.items())
+    scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+    full_answer = "The best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day."
+    for entry in datas:
+        entry["rouge1_score"] = scorer.score(full_answer, entry["response"])["rouge1"].recall
+        entry["rouge2_score"] = scorer.score(full_answer, entry["response"])["rouge2"].recall
+        entry["rougeL_score"] = scorer.score(full_answer, entry["response"])["rougeL"].recall
+
     with open(f"{output_path}/{run_name}.json", "w") as json_file:
         json.dump(datas, json_file)
 

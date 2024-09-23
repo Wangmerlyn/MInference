@@ -40,8 +40,11 @@ run_name="${attn_type}_${model_name_last_part}"
 echo "Run Name: $run_name"
 
 # Load Haystack
-mkdir -p data
-wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl -O ./data/pg19_mini.jsonl
+# mkdir -p data
+# wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl -O ./data/pg19_mini.jsonl
+
+# download paul grahams
+python experiments/needle_in_a_haystack/download_paulgraham_essay.py
 
 echo "starting 0-4"
 # Run the Needle in A Haystack Test

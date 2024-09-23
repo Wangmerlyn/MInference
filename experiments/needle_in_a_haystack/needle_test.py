@@ -13,7 +13,7 @@ from needle_viz import plot_needle_viz
 @dataclass
 class Config:
     # wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl
-    haystack_file: str = "data/pg19_mini.jsonl"  # Path to the haystack file
+    haystack_file: str = "experiments/needle_in_a_haystack/PaulGrahamEssays.txt"  # Path to the haystack file
     model_name: str = "01-ai/Yi-9B-200K"
     run_name: str = None  # Name of the run, used for the output file
     context_lengths_min: int = 30_000

@@ -48,11 +48,12 @@ def plot_needle_viz(
 
     df = pd.read_json(res_file)
     accuracy_df = df.groupby(["context_length", "depth_percent"])["correct"].mean()
+    accuracy_df = df.groupby(["context_length", "depth_percent"])["rouge1_score"].mean()
     accuracy_df = accuracy_df
     accuracy_df = accuracy_df.reset_index()
     accuracy_df = accuracy_df.rename(
         columns={
-            "correct": "Score",
+            "rouge1_score": "Score",
             "context_length": "Context Length",
             "depth_percent": "Document Depth",
         }
@@ -137,7 +138,7 @@ def plot_needle_viz(
     # Save and Show the plot
     save_path = os.path.join(
         output_path,
-        f"needle_viz_{model_name}_{mode}_{min_context_str}_{max_context_str}.pdf",
+        f"needle_viz_{model_name}_{mode}_{min_context_str}_{max_context_str}_rouge.pdf",
     )
     plt.savefig(save_path, dpi=1000)
     print(f"Needle plot saved to {save_path}.")
