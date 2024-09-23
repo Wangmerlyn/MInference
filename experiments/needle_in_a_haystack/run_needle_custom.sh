@@ -36,7 +36,7 @@ model_name_last_part=$(basename $model_name)
 echo "Extracted Model Name: $model_name_last_part"
 
 # Set run_name as attn_type + "_" + model_name_last_part
-run_name="${attn_type}_${model_name_last_part}"
+run_name="${attn_type}_${model_name_last_part}_rouge"
 echo "Run Name: $run_name"
 
 # Load Haystack
