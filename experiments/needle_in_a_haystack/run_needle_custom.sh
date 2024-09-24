@@ -56,7 +56,8 @@ python experiments/needle_in_a_haystack/needle_test.py \
     --attn_type $attn_type \
     --output_path $needle_output_path \
     --run_name $run_name \
-    --jobs 0-4
+    --jobs 0-4 \
+    --trust_remote_code
 echo "finish 0-4"
 python experiments/needle_in_a_haystack/needle_test.py \
     --model_name $model_name \
@@ -67,7 +68,8 @@ python experiments/needle_in_a_haystack/needle_test.py \
     --kv_cache_cpu \
     --output_path $needle_output_path \
     --run_name $run_name \
-    --jobs 4-15
+    --jobs 4-15 \
+    --trust_remote_code
 echo "finish 4-15"
 echo "starting summary"
 
