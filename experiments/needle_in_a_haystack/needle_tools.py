@@ -267,7 +267,7 @@ class LLMNeedleHaystackTester:
             context = ""
             toks = 0
             while toks < max_context_length:
-                text = json.loads(f.readline())
+                text = f.readline()
                 context += text
                 toks += len(self.tokenizer.encode(text))
             contexts.append(context)
