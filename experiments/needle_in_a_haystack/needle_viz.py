@@ -139,6 +139,12 @@ def plot_needle_viz(
         output_path,
         f"needle_viz_{model_name}_{mode}_{min_context_str}_{max_context_str}.pdf",
     )
+    df_save_path = os.path.join(
+        output_path,
+        f"{model_name}_{mode}_{min_context_str}_{max_context_str}.csv",
+    )
+    # save the pivot table to a csv
+    pivot_table.to_csv(df_save_path)
     plt.savefig(save_path, dpi=1000)
     print(f"Needle plot saved to {save_path}.")
     plt.show()
