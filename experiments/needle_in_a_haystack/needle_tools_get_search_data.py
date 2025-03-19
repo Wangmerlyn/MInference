@@ -9,15 +9,14 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import cached_property
+from multiprocessing import Pool
 
 import numpy as np
 import torch
 from absl.app import run
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
-from vllm import LLM, SamplingParams
 
-from minference import MInference
 
 
 class LLMNeedleHaystackTester:
@@ -231,19 +230,22 @@ class LLMNeedleHaystackTester:
                 prompt = template.format(
                     context=context["context"], question=context["question"]
                 )
-                answer = "The best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day."
+                answer = "eat a sandwich and sit in Dolores Park on a sunny day"
                 results.append(
                     {
                         "context_length": context["context_length"],
                         "depth_percent": context["depth_percent"],
                         "answer": answer,
                         "seed": context["seed"],
-                        "synthetic": self.tokenizer.encode(prompt+answer),
-                        "synthetic_length": len(self.tokenizer.encode(prompt+answer)),
+                        "input": context['question'],
+                        "context": context["context"],
+                        "synthetic": (prompt),
+                        "synthetic_length": len(self.tokenizer.encode(prompt)),
                     }
                 )
             with open(self.config.output_file, "w") as f:
-                json.dump(results, f)
+                for result in results:
+                    f.write(json.dumps(result) + "\n")
         print("elapsed", time.time() - start)
         print("done")
         print(f"Saved results to {self.config.output_file}")
@@ -268,28 +270,59 @@ class LLMNeedleHaystackTester:
 @dataclass
 class Config:
     # wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl
-    haystack_file: str = "data/pg19_mini.jsonl"  # Path to the haystack file
+    haystack_file: str = "/mnt/longcontext/models/siyuan/test_code/longcontext_syth/books3-hf/books3_5000.jsonl"  # Path to the haystack file
     # model_name: str = "/mnt/longcontext/models/nishang/mistral_version"  # Path to the model
-    model_name:str = "/mnt/longcontext/models/nishang/phi-3-1-mini-l-m-5-3-8k-128k-ntk-159.5-mscale-1-8k-128k-step-200"
+    model_name:str = "/mnt/longcontext/models/siyuan/llama3/Llama-3.1-8B-Instruct"  # Path to the model
     run_name: str = None  # Name of the run, used for the output file
     # 113 for phi3 offset
     # 118 for llama3
     # 118 for llama3 256k
-    context_lengths_min: int = 131072+118+131072
-    context_lengths_max: int = 131072+118+131072
+    # context_lengths_min: int = 131072+118+131072
+    # context_lengths_max: int = 131072+118+131072
+    context_lengths_min: int = 4096
+    context_lengths_max: int = 4096
     n_context_length_intervals: int = 1  # Number of intervals between min and max
     n_document_depth_intervals: int = 10  # position of the needle in the haystack
-    n_rounds: int = 1
+    n_rounds: int = 1000
     seed: int = 42
-    output_path: str = "results/needle/"
+    output_path: str = "/mnt/longcontext/models/siyuan/test_code/longcontext_syth/books3-hf"  # Path to save the results
     pattern_path: str = "config/Llama_3_8B_Instruct_262k_kv_out_v32_best_pattern.json"
     jobs: str = None
     kv_cache_cpu: bool = False
     trust_remote_code: bool = False
     kv_cache_cpu_device: str = "cpu"
-    output_file = "needle_llama3_search_256k.json"
+    output_file = "sentence_needle_llama_4096_5000samples.jsonl"
 
-if __name__ == "__main__":
-    config = Config
+# if __name__ == "__main__":
+#     config = Config
+#     for length in [4096, 8192, 16384, 32768, 65536, 131072]:
+#         config.context_lengths_min = length
+#         config.context_lengths_max = length
+#         config.output_file = f"sentence_needle_llama_{length}_5000samples.json"
+#         print(f"Running with context length {length}")
+#         niah_tester = LLMNeedleHaystackTester(config)
+#         niah_tester.start_test()
+
+
+def run_test(length):
+    """
+    A helper function to run the test for a single context length.
+    """
+    # Create a new Config instance (avoid modifying the same Config across processes)
+    config = Config()
+    config.context_lengths_min = length
+    config.context_lengths_max = length
+    config.output_file = f"sentence_needle_llama_{length}_10000samples.jsonl"
+    
+    print(f"Running with context length {length} in a separate process.")
     niah_tester = LLMNeedleHaystackTester(config)
     niah_tester.start_test()
+
+if __name__ == "__main__":
+    lengths = [4096, 8192, 16384, 32768, 65536, 131072]
+
+    with Pool() as pool:
+        # This runs run_test(length) for each length in the list in parallel
+        pool.map(run_test, lengths)
+
+    print("All tests completed!")
