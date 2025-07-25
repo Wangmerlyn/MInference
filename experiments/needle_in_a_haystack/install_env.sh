@@ -4,4 +4,4 @@ conda activate cic
 which python
 
 pip install vllm
-pip install  minference, seaborn, absl-py, rouge_score, html2text, bs4
+pip install  minference seaborn absl-py rouge_score html2text bs4
