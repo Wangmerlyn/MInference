@@ -21,7 +21,8 @@ from minference import MInference
 
 
 class LLMNeedleHaystackTester:
-    OURS_TEMPLATE = "Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).\n{context}\n\nQuestion: {question} Don't give information outside the document or repeat your findings. Keep your response short and direct. Answer: "
+    # OURS_TEMPLATE = "Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).\n{context}\n\nQuestion: {question} Don't give information outside the document or repeat your findings. Keep your response short and direct. Answer: "
+    OURS_TEMPLATE="The following are given passages.\n{context}\n\nQuestion: {question}"
     RANDOM_NEEDLE_CITIES = [
         "Chicago",
         "Yangon",
@@ -202,17 +203,17 @@ class LLMNeedleHaystackTester:
         self.tokenizer = AutoTokenizer.from_pretrained(
             config.model_name, trust_remote_code=config.trust_remote_code
         )
-        minference_patch = MInference(
-            self.config.attn_type,
-            self.config.model_name,
-            self.config.pattern_path,
-            starting_layer=0,
-            kv_cache_cpu=self.config.kv_cache_cpu,
-            kv_cache_cpu_device=self.config.kv_cache_cpu_device,
-            attn_kwargs=(
-                {} if self.config.attn_type != "inf_llm" else {"dense_decoding": False}
-            ),
-        )
+        # minference_patch = MInference(
+        #     self.config.attn_type,
+        #     self.config.model_name,
+        #     self.config.pattern_path,
+        #     starting_layer=0,
+        #     kv_cache_cpu=self.config.kv_cache_cpu,
+        #     kv_cache_cpu_device=self.config.kv_cache_cpu_device,
+        #     attn_kwargs=(
+        #         {} if self.config.attn_type != "inf_llm" else {"dense_decoding": False}
+        #     ),
+        # )
         if self.config.attn_type == "vllm":
             #### use vllm implementation
             self.model = LLM(
@@ -240,7 +241,7 @@ class LLMNeedleHaystackTester:
                     trust_remote_code=config.trust_remote_code,
                     **kwargs,
                 )
-            self.model = minference_patch(self.model)
+            # self.model = minference_patch(self.model)
             self.generation_config = GenerationConfig(
                 max_new_tokens=32,
                 pad_token_id=self.tokenizer.pad_token_id,
@@ -389,7 +390,10 @@ class LLMNeedleHaystackTester:
                     context=context["context"], question=context["question"]
                 )
                 if self.config.attn_type == "vllm":
-                    outs = self.model.generate(prompt, self.generation_config)
+                    # prompt_ids = self.tokenizer.apply_chat_template(
+                        # {"user": prompt}, add_generation_prompt=True)
+                    print(self.tokenizer.apply_chat_template([{"role": "user", "content": prompt}], add_generation_prompt=True, tokenize=False))
+                    outs = self.model.chat([{"role": "user", "content": prompt}], self.generation_config)
                     out = outs[0].outputs[0].text
                 else:
                     input_tensor = self.tokenizer(

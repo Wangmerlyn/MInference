@@ -34,7 +34,7 @@ class Config:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
-        output_file = f"needle_res_{self.model_name.replace('/', '-')}_{self.run_name if self.run_name is not None else ''}_{self.jobs if self.jobs is not None else ''}_{timestamp}_{self.context_lengths_min}_{self.context_lengths_max}_{self.pattern_path.split('/')[-1].replace('.json', '') if self.pattern_path is not None else ''}.json"
+        output_file = f"needle_res_{os.path.basename(self.model_name)}_{self.run_name if self.run_name is not None else ''}_{self.jobs if self.jobs is not None else ''}_{timestamp}_{self.context_lengths_min}_{self.context_lengths_max}_{self.pattern_path.split('/')[-1].replace('.json', '') if self.pattern_path is not None else ''}.json"
         self.output_file = os.path.join(self.output_path, output_file)
 
 
@@ -68,7 +68,8 @@ def main(
     )
     kwargs = {
         "swap_space": 64,
-        "gpu_memory_utilization": 0.98,
+        "gpu_memory_utilization": 0.9,
+        "tensor_parallel_size": int(os.getenv("niah_tp_size", "4")),
     }
     ht = LLMNeedleHaystackTester(config, **kwargs if config.attn_type == "vllm" else {})
     ht.start_test()
