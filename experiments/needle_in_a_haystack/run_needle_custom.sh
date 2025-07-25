@@ -40,8 +40,8 @@ run_name="${attn_type}"
 echo "Run Name: $run_name"
 
 # Load Haystack
-# mkdir -p data
-# wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl -O ./data/pg19_mini.jsonl
+mkdir -p data
+wget https://github.com/liyucheng09/LatestEval/releases/download/pg19/pg19_mini.jsonl -O ./data/pg19_mini.jsonl
 
 # download paul grahams
 # python experiments/needle_in_a_haystack/download_paulgraham_essay.py
