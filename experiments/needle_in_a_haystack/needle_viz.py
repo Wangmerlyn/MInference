@@ -2,9 +2,6 @@
 # Licensed under The MIT License [see LICENSE for details]
 
 import argparse
-import glob
-import json
-import math
 import os
 
 import matplotlib.pyplot as plt
@@ -38,7 +35,7 @@ def plot_needle_viz(
             return "10K" if x > 5000 else "1K"
         if round(x / 1000) == 128:
             return "128K"
-        return f"{round(x / 10000)* 10}K"
+        return f"{round(x / 10000) * 10}K"
 
     plt.rc("axes", titlesize=25)  # fontsize of the title
     plt.rc("axes", labelsize=25)  # fontsize of the x and y labels
@@ -48,12 +45,12 @@ def plot_needle_viz(
 
     df = pd.read_json(res_file)
     accuracy_df = df.groupby(["context_length", "depth_percent"])["correct"].mean()
-    accuracy_df = df.groupby(["context_length", "depth_percent"])["rouge1_score"].mean()
+    # accuracy_df = df.groupby(["context_length", "depth_percent"])["rouge1_score"].mean()
     accuracy_df = accuracy_df
     accuracy_df = accuracy_df.reset_index()
     accuracy_df = accuracy_df.rename(
         columns={
-            "rouge1_score": "Score",
+            "correct": "Score",
             "context_length": "Context Length",
             "depth_percent": "Document Depth",
         }
@@ -68,7 +65,11 @@ def plot_needle_viz(
     pivot_table = pivot_table.pivot(
         index="Document Depth", columns="Context Length", values="Score"
     )  # This will turn into a proper pivot
-
+    # save the table
+    pivot_table.to_csv(
+        os.path.join(output_path, f"needle_viz_{model_name}_{mode}_table.csv"),
+        index=True,
+    )
     # Create a custom colormap. Go to https://coolors.co/ and pick cool colors
     cmap = LinearSegmentedColormap.from_list(
         "custom_cmap", ["#F0496E", "#EBB839", "#0CD79F"]

@@ -47,7 +47,7 @@ echo "Run Name: $run_name"
 # python experiments/needle_in_a_haystack/download_paulgraham_essay.py
 
 echo "starting 0-4"
-# Run the Needle in A Haystack Test
+Run the Needle in A Haystack Test
 python experiments/needle_in_a_haystack/needle_test.py \
     --model_name $model_name \
     --max_length $max_length \
@@ -74,8 +74,10 @@ echo "finish 4-15"
 echo "starting summary"
 
 # Data Summary
-python experiments/needle_in_a_haystack/needle_summary.py --output_path $summary_output_path --run_name $run_name --needle_path $needle_output_path
+result_file_prefix="needle_res_${model_name_last_part}_${attn_type}"
+
+python experiments/needle_in_a_haystack/needle_summary.py --output_path $summary_output_path --run_name $result_file_prefix --needle_path $needle_output_path
 echo "starting plot"
 # Visualization
 mkdir -p $figure_output_path
-python experiments/needle_in_a_haystack/needle_viz.py --res_file $summary_output_path/$run_name.json --model_name $model_name_last_part --mode hf --output_path $figure_output_path
+python experiments/needle_in_a_haystack/needle_viz.py --res_file $summary_output_path/needle_res_${model_name_last_part}_${attn_type}.json --model_name $model_name_last_part --mode $run_name --output_path $figure_output_path
