@@ -218,10 +218,11 @@ class LLMNeedleHaystackTester:
             self.model = LLM(
                 model=self.config.model_name,
                 max_num_seqs=1,
-                max_model_len=context_lengths_max,
+                # max_model_len=context_lengths_max,
+                max_model_len=131072,
                 **kwargs,
             )
-            self.generation_config = SamplingParams(temperature=0, max_tokens=64)
+            self.generation_config = SamplingParams(temperature=0.6, max_tokens=2048)
         else:
             if self.config.attn_type == "hf":
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -408,7 +409,7 @@ class LLMNeedleHaystackTester:
                         "depth_percent": context["depth_percent"],
                         "response": out,
                         "answer": context["needle_rnd_number"],
-                        "correct": context["needle_rnd_number"].lower() in out.lower(),
+                        "correct": context["needle_rnd_number"].lower() in out.split("</think>")[-1].lower(),
                         "seed": context["seed"],
                     }
                 )
