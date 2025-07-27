@@ -17,7 +17,7 @@ from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 from vllm import LLM, SamplingParams
 
-from minference import MInference
+# from minference import MInference
 
 
 class LLMNeedleHaystackTester:
@@ -202,17 +202,17 @@ class LLMNeedleHaystackTester:
         self.tokenizer = AutoTokenizer.from_pretrained(
             config.model_name, trust_remote_code=config.trust_remote_code
         )
-        minference_patch = MInference(
-            self.config.attn_type,
-            self.config.model_name,
-            self.config.pattern_path,
-            starting_layer=0,
-            kv_cache_cpu=self.config.kv_cache_cpu,
-            kv_cache_cpu_device=self.config.kv_cache_cpu_device,
-            attn_kwargs=(
-                {} if self.config.attn_type != "inf_llm" else {"dense_decoding": False}
-            ),
-        )
+        # minference_patch = MInference(
+        #     self.config.attn_type,
+        #     self.config.model_name,
+        #     self.config.pattern_path,
+        #     starting_layer=0,
+        #     kv_cache_cpu=self.config.kv_cache_cpu,
+        #     kv_cache_cpu_device=self.config.kv_cache_cpu_device,
+        #     attn_kwargs=(
+        #         {} if self.config.attn_type != "inf_llm" else {"dense_decoding": False}
+        #     ),
+        # )
         if self.config.attn_type == "vllm":
             #### use vllm implementation
             self.model = LLM(
@@ -239,7 +239,7 @@ class LLMNeedleHaystackTester:
                     trust_remote_code=config.trust_remote_code,
                     **kwargs,
                 )
-            self.model = minference_patch(self.model)
+            # self.model = minference_patch(self.model)
             self.generation_config = GenerationConfig(
                 max_new_tokens=32,
                 pad_token_id=self.tokenizer.pad_token_id,
