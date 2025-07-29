@@ -227,6 +227,10 @@ class LLMNeedleHaystackTester:
                     kwargs['hf_overrides'] = {
                         "rope_scaling": {"rope_type": "yarn", "factor": 4.0, "original_max_position_embeddings": 35268}
                     }
+                else:
+                    kwargs["hf_overrides"] = {
+                        "max_position_embeddings": 138*1024,
+                    }
             else:
                 kwargs["max_model_len"] = 128*1024
                 print("✅ NOT USING SUPER_FORCE_138K")
