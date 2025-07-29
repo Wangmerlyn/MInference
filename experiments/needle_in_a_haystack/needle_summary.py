@@ -12,7 +12,7 @@ def summary(run_name: str, output_path: str, needle_path: str):
 
     datas, cs = [], set()
     for path in pathlist:
-        if run_name in path and path.endswith(".json"):
+        if run_name in path and path.endswith(".json") and "needle_res" in path:
             data = json.load(open(os.path.join(needle_path, path)))
             if data[0]["context_length"] in cs:
                 continue
@@ -20,6 +20,8 @@ def summary(run_name: str, output_path: str, needle_path: str):
             cs.add(data[0]["context_length"])
 
     res = Counter()
+    for ii in datas:
+        ii['correct'] = ii['answer'] in ii['response']
     for ii in datas:
         res[(ii["context_length"], ii["depth_percent"])] += ii["correct"] == True
         if ii["correct"] is False:

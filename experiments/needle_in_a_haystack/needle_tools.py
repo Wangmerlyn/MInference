@@ -215,13 +215,24 @@ class LLMNeedleHaystackTester:
         )
         if self.config.attn_type == "vllm":
             #### use vllm implementation
+            if os.getenv("SUPER_FORCE_138K", "false").lower() == "true":
+                print("✅ USING SUPER_FORCE_138K")
+                os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
+                kwargs["max_model_len"] = 138*1024
+                if "yarn" in config.model_name.lower():
+                    kwargs['hf_overrides'] = {
+                        "rope_scaling": {"rope_type": "yarn", "factor": 4.0, "original_max_position_embeddings": 35268}
+                    }
+            else:
+                kwargs["max_model_len"] = 128*1024
+                print("✅ NOT USING SUPER_FORCE_138K")
             self.model = LLM(
                 model=self.config.model_name,
                 max_num_seqs=1,
-                max_model_len=context_lengths_max,
+                # max_model_len=context_lengths_max,
                 **kwargs,
             )
-            self.generation_config = SamplingParams(temperature=0, max_tokens=64)
+            self.generation_config = SamplingParams(temperature=0.6, max_tokens=3000)
         else:
             if self.config.attn_type == "hf":
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -239,7 +250,7 @@ class LLMNeedleHaystackTester:
                     trust_remote_code=config.trust_remote_code,
                     **kwargs,
                 )
-            self.model = minference_patch(self.model)
+            # self.model = minference_patch(self.model)
             self.generation_config = GenerationConfig(
                 max_new_tokens=32,
                 pad_token_id=self.tokenizer.pad_token_id,
@@ -387,7 +398,12 @@ class LLMNeedleHaystackTester:
                     context=context["context"], question=context["question"]
                 )
                 if self.config.attn_type == "vllm":
-                    outs = self.model.generate(prompt, self.generation_config)
+                    # outs = self.model.generate(prompt, self.generation_config)
+                    outs = self.model.chat(
+                        messages=[{"role": "user", "content": prompt}],
+                        sampling_params=self.generation_config,
+                        use_tqdm=True,
+                        )
                     out = outs[0].outputs[0].text
                 else:
                     input_tensor = self.tokenizer(
