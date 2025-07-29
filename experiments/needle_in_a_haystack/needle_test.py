@@ -69,7 +69,7 @@ def main(
     kwargs = {
         "swap_space": 64,
         "gpu_memory_utilization": 0.9,
-        "tensor_parallel_size": os.getenv("TP_SIZE", "4"),
+        "tensor_parallel_size": int(os.getenv("TP_SIZE", "4")),
     }
     ht = LLMNeedleHaystackTester(config, **kwargs if config.attn_type == "vllm" else {})
     ht.start_test()
