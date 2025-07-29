@@ -21,7 +21,7 @@ from minference import MInference
 
 
 class LLMNeedleHaystackTester:
-    if int(os.getenv("NO_THINK", 0)) is 1:
+    if int(os.getenv("NO_THINK", 0)) == 1:
         OURS_TEMPLATE = "Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).\n{context}\n\nQuestion: {question} Don't give information outside the document or repeat your findings. Keep your response short and direct. Answer: "
     else:
         OURS_TEMPLATE = "Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).\n{context}\n\nQuestion: {question}"
