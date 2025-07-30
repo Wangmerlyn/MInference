@@ -240,7 +240,16 @@ class LLMNeedleHaystackTester:
                 # max_model_len=context_lengths_max,
                 **kwargs,
             )
-            self.generation_config = SamplingParams(temperature=0.6, max_tokens=8192 if os.getenv("NO_THINK", "0") != "1" else 64)
+            if os.getenv("NO_THINK", "0") != "1":
+                self.generation_config = SamplingParams(
+                    temperature=0.6,
+                    max_tokens=8192,
+                )
+            else:
+                self.generation_config = SamplingParams(
+                    temperature=0,
+                    max_tokens=64,
+                )
         else:
             if self.config.attn_type == "hf":
                 self.model = AutoModelForCausalLM.from_pretrained(
