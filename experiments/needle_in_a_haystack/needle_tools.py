@@ -223,7 +223,9 @@ class LLMNeedleHaystackTester:
                 print("✅ USING SUPER_FORCE_138K")
                 os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
                 kwargs["max_model_len"] = 138*1024
-                if "yarn" in config.model_name.lower():
+                if "yarn" in config.model_name.lower() or ("deepseek-r1" in config.model_name.lower() and "qwen3" in config.model_name.lower()):
+                    print("detected yarn or deepseek-r1-qwen3, using yarn rope scaling")
+                    print("✅ USING YARN ROPE SCALING")
                     kwargs['hf_overrides'] = {
                         "rope_scaling": {"rope_type": "yarn", "factor": 4.0, "original_max_position_embeddings": 35268}
                     }
