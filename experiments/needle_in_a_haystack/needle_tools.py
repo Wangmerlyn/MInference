@@ -381,6 +381,19 @@ class LLMNeedleHaystackTester:
         ]
 
         start = time.time()
+        # check if the output file already exists
+        results = []
+        current_context_index = 0
+        if os.path.exists(self.config.output_file):
+            try:
+                with open(self.config.output_file, "r") as f:
+                    results = json.load(f)
+                print(f"✅ Reusing existing results from {self.config.output_file}")
+            except json.JSONDecodeError:
+                print(f"❌ Failed to load existing results from {self.config.output_file}, starting fresh.")
+                results = []
+        else:
+            print(f"❌ No existing results found, starting fresh.")
         for context_length in self.context_lengths:
             torch.cuda.empty_cache()
             trim_contexts = [
@@ -410,7 +423,13 @@ class LLMNeedleHaystackTester:
                     )
                     contexts.append(context)
 
-            for context in tqdm(contexts):
+            for i, context in tqdm(enumerate(contexts)):
+                # check if we already have a result for this context
+                if current_context_index < len(results):
+                    print(f"Checking existing result for context {current_context_index}...")
+                    current_context_index += 1
+                    continue
+                current_context_index += 1
                 prompt = template.format(
                     context=context["context"], question=context["question"]
                 )
